@@ -10,10 +10,10 @@
 {
   // ── Model Configuration ───────────────────────────────────────────────────
   //
-  // Set your default model. The AIBR framework defaults to claude-opus-4-5
+  // Set your default model. The AIBR framework defaults to claude-opus-4-6
   // for planning sessions and routes lighter tasks to Sonnet/Haiku via skills.
   //
-  // "model": "claude-opus-4-5",
+  // "model": "claude-opus-4-6",
   //
   // If you use an API key helper (e.g. for AWS Bedrock or GCP Vertex):
   // "apiKeyHelper": "/path/to/your/key-helper-script.sh",
