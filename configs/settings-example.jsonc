@@ -1,0 +1,170 @@
+// AIBR Agent Framework — Example settings.json
+//
+// This is an annotated template for ~/.claude/settings.json
+// Copy relevant sections into your own settings.json.
+// JSON does not support comments — strip them before use, or use a JSONC-aware tool.
+//
+// Full Claude Code settings reference:
+// https://docs.anthropic.com/en/docs/claude-code/settings
+
+{
+  // ── Model Configuration ───────────────────────────────────────────────────
+  //
+  // Set your default model. The AIBR framework defaults to claude-opus-4-5
+  // for planning sessions and routes lighter tasks to Sonnet/Haiku via skills.
+  //
+  // "model": "claude-opus-4-5",
+  //
+  // If you use an API key helper (e.g. for AWS Bedrock or GCP Vertex):
+  // "apiKeyHelper": "/path/to/your/key-helper-script.sh",
+
+  // ── Permission Rules ──────────────────────────────────────────────────────
+  //
+  // Rules control which tools Claude can use without asking for confirmation.
+  // "allow" rules permit actions. "deny" rules block them (deny takes priority).
+  //
+  "permissions": {
+    "allow": [
+      // Allow reading all files by default
+      "Read(**)",
+      // Allow running common dev commands without confirmation
+      "Bash(git status)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(npm run*)",
+      "Bash(npx tsc*)"
+    ],
+    "deny": [
+      // Block writes to sensitive credential directories
+      "Write(~/.ssh/**)",
+      "Write(~/.aws/**)",
+      "Write(~/.gnupg/**)",
+      // Block direct production database operations
+      "Bash(*DROP TABLE*)",
+      "Bash(*DELETE FROM* WHERE*)",
+      // Block force-push to main/master
+      "Bash(git push*--force*main*)",
+      "Bash(git push*--force*master*)",
+      // Block committing .env files
+      "Bash(git add*.env*)"
+    ]
+  },
+
+  // ── Hooks ─────────────────────────────────────────────────────────────────
+  //
+  // Hooks wire shell scripts into Claude Code's lifecycle events.
+  // Scripts receive event data via stdin as JSON.
+  // Exit 0 = proceed, Exit 1 = block (PreToolUse only), Exit 2 = warn.
+  //
+  // Hook script paths below assume you've copied hooks/ to ~/.claude/hooks/
+  // Adjust paths to wherever you store your hook scripts.
+  //
+  "hooks": {
+
+    // PreToolUse: fires before each tool call. Can block (exit 1) or warn.
+    "PreToolUse": [
+      {
+        // Match Bash tool calls only
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            // Trust Gate: progressive autonomy — blocks destructive ops at low trust
+            "command": "bash ~/.claude/hooks/pre-tool/trust-gate.sh"
+          },
+          {
+            "type": "command",
+            // Branch Protection: warns on direct push to main/master
+            "command": "bash ~/.claude/hooks/pre-tool/branch-protection.sh"
+          },
+          {
+            "type": "command",
+            // Secret Scanner: checks for API keys before git add
+            "command": "bash ~/.claude/hooks/pre-tool/secret-scanner.sh"
+          },
+          {
+            "type": "command",
+            // Disk Space Guard: warns if <5GB free before installs/builds
+            "command": "bash ~/.claude/hooks/pre-tool/disk-space-guard.sh"
+          }
+        ]
+      }
+    ],
+
+    // PostToolUse: fires after each tool call completes.
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            // Auto-Diagnose: categorizes non-zero exit codes into structured errors
+            // 25+ failure mode signatures — eliminates the "retry same command" loop
+            "command": "bash ~/.claude/hooks/post-tool/auto-diagnose.sh"
+          }
+        ]
+      }
+    ],
+
+    // Stop: fires when Claude finishes generating a response.
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            // Memory Extract: sends session context to Haiku API for distillation
+            // Automatically writes non-obvious learnings to the memory pipeline
+            // Requires ANTHROPIC_API_KEY in environment
+            "command": "bash ~/.claude/hooks/stop/memory-extract.sh"
+          }
+        ]
+      }
+    ],
+
+    // SessionStart: fires once when a new Claude Code session begins.
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            // Load Context: reads MEMORY.md and active plan files into session
+            "command": "bash ~/.claude/hooks/session-start/load-context.sh"
+          }
+        ]
+      }
+    ]
+  },
+
+  // ── MCP Servers ───────────────────────────────────────────────────────────
+  //
+  // MCP (Model Context Protocol) servers extend Claude Code with additional tools.
+  // Add entries here for each MCP server you want available in sessions.
+  //
+  "mcpServers": {
+
+    // Example: filesystem access via official MCP server
+    // "filesystem": {
+    //   "command": "npx",
+    //   "args": ["-y", "@modelcontextprotocol/server-filesystem", "/your/project/path"]
+    // },
+
+    // Example: GitHub MCP server for PR/issue management
+    // "github": {
+    //   "command": "npx",
+    //   "args": ["-y", "@modelcontextprotocol/server-github"],
+    //   "env": {
+    //     "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+    //   }
+    // },
+
+    // Example: Brave Search for web research
+    // "brave-search": {
+    //   "command": "npx",
+    //   "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+    //   "env": {
+    //     "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+    //   }
+    // }
+
+  }
+}

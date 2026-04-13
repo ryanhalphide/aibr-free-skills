@@ -164,7 +164,3 @@ SCORE: [X/100]
 ## After the Report
 
 Do not auto-fix anything. Present the report and let the user decide which items to address. For any item the user selects, use the appropriate skill to resolve it (e.g., `quick-debug` for errors, `smart-commit` after fixes).
-
----
-
-*Part of the AIBR Agent Framework. Get the full 50+ skill suite at https://aiboosted4.gumroad.com/l/claude-code-power-user*

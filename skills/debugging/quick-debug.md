@@ -108,7 +108,3 @@ Hypothesis 3 (10%): Stale type definitions — runtime shape differs from TypeSc
 
 Verifying H1...
 ```
-
----
-
-*Part of the AIBR Agent Framework. Get the full 50+ skill suite at https://aiboosted4.gumroad.com/l/claude-code-power-user*

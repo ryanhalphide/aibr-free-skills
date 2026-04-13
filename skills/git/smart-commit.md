@@ -124,7 +124,3 @@ Unstaged (left for a separate commit):
 ## Quick Mode
 
 If the argument provided is a specific scope or issue reference (e.g., `fixes #42`), incorporate it directly into the commit message subject or footer.
-
----
-
-*Part of the AIBR Agent Framework. Get the full 50+ skill suite at https://aiboosted4.gumroad.com/l/claude-code-power-user*

@@ -1,0 +1,9 @@
+{
+  "name": "optimizer",
+  "version": "1.0.0",
+  "description": "Claude workspace optimizer — tracks token costs, analyzes usage patterns, and generates a prioritized plan to improve your Claude Code configuration",
+  "author": "AI Boost Realization",
+  "homepage": "https://aibr.pro",
+  "skills": ["optimize", "cost-track"],
+  "tags": ["productivity", "optimization", "cost-management"]
+}
